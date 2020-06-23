@@ -20,7 +20,11 @@ import assignment.api.Get;
 import assignment.pojo.TempratureInfo;
 
 public class CityTemprature {
-	public static HashMap<String, TempratureInfo> getTemprature() throws IOException{
+	 private static HashMap<String, TempratureInfo> cityTempratureUI = 
+             new HashMap<String, TempratureInfo>(); 
+	public static synchronized HashMap<String, TempratureInfo> getTemprature() throws IOException{
+		if(cityTempratureUI.size()>0)
+			return cityTempratureUI;
 		//Load properties
 		Map properties=ConfigOperation.getProperties();
 		// System Property for Chrome Driver   
@@ -35,8 +39,6 @@ public class CityTemprature {
 		//Maximize the browser  
 		driver.manage().window().maximize();  
 		 //Read existing data from csv
-		 HashMap<String, TempratureInfo> cityTempratureUI = 
-                 new HashMap<String, TempratureInfo>(); 
 		 driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		 int totalCity=0;
 		 for (int i = 1;; i++) {

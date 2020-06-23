@@ -8,6 +8,7 @@ import com.vocera.abx.configuration.ConfigOperation;
 
 import assignment.pojo.TempratureInfo;
 import assignment.readjson.ParseJsonResponse;
+import net.minidev.json.JSONObject;
 /**
  * Read the city temprature from the rest end point
  * @author rsangoli
@@ -19,14 +20,17 @@ public class CityTemprature {
 	 * @param Temp
 	 * @return
 	 */
+	private static HashMap<String, TempratureInfo> cityTempratureAPI = 
+            new HashMap<String, TempratureInfo>();
+	
 	public static String TempInDegree(String Temp){
-		return String.valueOf((float) (300-Integer.parseInt(Temp)));
+		return String.valueOf((float) (Float.parseFloat(Temp)-273.15));
 	}
-	public static HashMap<String, TempratureInfo> getTemprature(HashMap<String, TempratureInfo> cityTempratureUI) throws IOException{
+	public static synchronized HashMap<String, TempratureInfo> getTemprature(HashMap<String, TempratureInfo> cityTempratureUI) throws IOException{
+		if(cityTempratureAPI.size()>0)
+			return cityTempratureAPI;
 		Map properties=ConfigOperation.getProperties();
 		//Read temprature from API
-		HashMap<String, TempratureInfo> cityTempratureAPI = 
-                new HashMap<String, TempratureInfo>();
 		Map<String,String> param = new HashMap();	
 		String URI=(String) properties.get("restendpoint");
 		String Header="Accept:application/json,Content-type:application/json";
@@ -44,7 +48,7 @@ public class CityTemprature {
 				String Response=get.getResponse();
 //				ParseJsonResponse jsonExp= new ParseJsonResponse();
 				System.out.println(Response);
-				String Temprature=ParseJsonResponse.parseJson(Response, "$.main.temp");
+				String Temprature=(ParseJsonResponse.parseJson(Response, "$.main.temp")).toString();
 				String Humidity=ParseJsonResponse.parseJson(Response, "$.main.humidity");
 				cityTempratureAPI.put(ParseJsonResponse.parseJson(Response, "$.name"), 
 						new TempratureInfo(Humidity, TempInDegree(Temprature)));
@@ -71,8 +75,10 @@ public class CityTemprature {
 		//Get response of request
 		String Response=get.getResponse();
 //		ParseJsonResponse jsonExp= new ParseJsonResponse();
-		
-		
+		String Temprature=(ParseJsonResponse.parseJson(Response, "$.main.temp")).toString();
+		System.out.println(TempInDegree(Temprature));;
+		String Humidity=ParseJsonResponse.parseJson(Response, "$.main.humidity");
+			
 		System.out.println(Response);
 	}
 }

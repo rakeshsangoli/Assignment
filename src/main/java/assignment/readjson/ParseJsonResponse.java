@@ -42,7 +42,7 @@ public class ParseJsonResponse {
 		} catch (Exception e2) {
 			try {
 				JsonPath path = JsonPath.compile(Expression); 
-				 String books = path.read(Response);
+				 String books = path.read(Response).toString();
 				return books;
 			} catch (Exception e3) {
 				try {
